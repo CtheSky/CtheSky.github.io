@@ -1,0 +1,797 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Github,Travis CI,Hexo," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="最近用 Hexo 建立了博客，部署在 Github 的个人主页上，Hexo每次生成的站点内容之后需要手动部署，次数多了就显得繁琐，Travis CI 提供了一个简洁的自动化部署方案。
+Travis CI 是什么？Travis CI 是一个开源的持续构建项目，支持自动化测试和部署。 目前已经支持大部分主流语言，和Github集成非常紧密，能够同步你在GitHub上托管的项目，检测到Commit Pu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Travis CI自动构建博客部署到Github">
+<meta property="og:url" content="http://yoursite.com/2016/08/19/使用Travis-CI自动构建博客部署到Github/index.html">
+<meta property="og:site_name" content="瞧天空的博客">
+<meta property="og:description" content="最近用 Hexo 建立了博客，部署在 Github 的个人主页上，Hexo每次生成的站点内容之后需要手动部署，次数多了就显得繁琐，Travis CI 提供了一个简洁的自动化部署方案。
+Travis CI 是什么？Travis CI 是一个开源的持续构建项目，支持自动化测试和部署。 目前已经支持大部分主流语言，和Github集成非常紧密，能够同步你在GitHub上托管的项目，检测到Commit Pu">
+<meta property="og:image" content="http://yoursite.com/2016/08/19/使用Travis-CI自动构建博客部署到Github/build_passing.png">
+<meta property="og:image" content="http://yoursite.com/2016/08/19/使用Travis-CI自动构建博客部署到Github/build_failing.png">
+<meta property="og:updated_time" content="2017-03-27T06:51:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Travis CI自动构建博客部署到Github">
+<meta name="twitter:description" content="最近用 Hexo 建立了博客，部署在 Github 的个人主页上，Hexo每次生成的站点内容之后需要手动部署，次数多了就显得繁琐，Travis CI 提供了一个简洁的自动化部署方案。
+Travis CI 是什么？Travis CI 是一个开源的持续构建项目，支持自动化测试和部署。 目前已经支持大部分主流语言，和Github集成非常紧密，能够同步你在GitHub上托管的项目，检测到Commit Pu">
+<meta name="twitter:image" content="http://yoursite.com/2016/08/19/使用Travis-CI自动构建博客部署到Github/build_passing.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 使用Travis CI自动构建博客部署到Github | 瞧天空的博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">瞧天空的博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用Travis CI自动构建博客部署到Github
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-19T14:59:38+00:00" content="2016-08-19">
+              2016-08-19
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/写写代码/" itemprop="url" rel="index">
+                    <span itemprop="name">写写代码</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/19/使用Travis-CI自动构建博客部署到Github/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/19/使用Travis-CI自动构建博客部署到Github/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近用 Hexo 建立了博客，部署在 Github 的个人主页上，Hexo每次生成的站点内容之后需要手动部署，次数多了就显得繁琐，Travis CI 提供了一个简洁的自动化部署方案。</p>
+<h2 id="Travis-CI-是什么？"><a href="#Travis-CI-是什么？" class="headerlink" title="Travis CI 是什么？"></a>Travis CI 是什么？</h2><p>Travis CI 是一个开源的持续构建项目，支持自动化测试和部署。 目前已经支持大部分主流语言，和Github集成非常紧密，能够同步你在GitHub上托管的项目，检测到Commit Push之后，就会在几分钟内开始根据你的配置来测试部署你的项目。</p>
+<p>目前托管在Github上的大部分知名项目都使用了Travis来做集成测试，<br>使用 Travis CI 的项目可以在README中增加目前版本的构建状态:（Travis 项目设置中的Status Images）<br><img src="/2016/08/19/使用Travis-CI自动构建博客部署到Github/build_passing.png" alt="build_passing.png" title=""><br><img src="/2016/08/19/使用Travis-CI自动构建博客部署到Github/build_failing.png" alt="build_failing.png" title=""></p>
+<h2 id="为你的项目启用-Travis-CI"><a href="#为你的项目启用-Travis-CI" class="headerlink" title="为你的项目启用 Travis CI"></a>为你的项目启用 Travis CI</h2><ol>
+<li>使用你的GitHub账号登录Travis-CI，确认授权GitHub的相关权限。</li>
+<li>登录之后，Travis CI 就会同步你GitHub账号的仓库。然后打开个人页面并给你想要构建的项目启用 Travis CI，就像这样：</li>
+<li>添加 <code>.travis.yml</code> 文件到你项目根目录下，这个文件包含构建该项目所需要知道的信息，Travis CI 会按照 <code>.travis.yml</code> 里的配置进行构建。</li>
+</ol>
+<h2 id="配置-travis-yml-文件"><a href="#配置-travis-yml-文件" class="headerlink" title="配置 .travis.yml 文件"></a>配置 <code>.travis.yml</code> 文件</h2><p>Travis CI 会根据  <code>.travis.yml</code> 中的配置来监听分支，当分支上出现 Commit Push 后，在虚拟机上获取该分支下的项目文件，根据配置进行构建、测试和部署，同时提供虚拟机的运行日志。下面以我的博客为例介绍如何配置：   </p>
+<h4 id="构建项目"><a href="#构建项目" class="headerlink" title="构建项目"></a>构建项目</h4><p>Github 个人主页要求站点内容放在 master 分支下，我把博客的源文件放在 content 分支下。<br>在 <code>.travis.yml</code> 中加入以下代码，这段配置告诉 Travis CI 这是一个 Node.js项目，当 content 分支出现变化时构建项目， 构建项目前在环境中安装 Hexo， 最后执行 Hexo 生成站点内容。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">language: node_js</div><div class="line">branches:</div><div class="line">  only:</div><div class="line">  - content</div><div class="line">before_install:</div><div class="line">- npm install -g hexo</div><div class="line">- npm install</div><div class="line">install:</div><div class="line">- hexo generate</div></pre></td></tr></table></figure></p>
+<h4 id="部署项目"><a href="#部署项目" class="headerlink" title="部署项目"></a>部署项目</h4><p>部署项目其实可以通命令行一系列 git 命令来完成，但这里 Hexo 提供的 hexo-deployer-git 插件十分简便，首先为 Hexo 安装插件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install --save hexo-deployer-git</div></pre></td></tr></table></figure></p>
+<p>在 <code>_config.yml</code> 加入以下代码启用 Hexo 部署插件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">  type: git</div><div class="line">  repo: git@github.com:CtheSky/CtheSky.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure></p>
+<p>在 <code>.travis.yml</code> 加入以下代码启用部署：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">script:</div><div class="line">- hexo deploy</div></pre></td></tr></table></figure></p>
+<h4 id="设置-Github-Token-给予部署权限"><a href="#设置-Github-Token-给予部署权限" class="headerlink" title="设置 Github Token 给予部署权限"></a>设置 Github Token 给予部署权限</h4><p>就和手动部署需要 SSH 认证一样，Travis CI 也需要得到授权才能修改 Github 仓库， 这里没有选择 SSH 授权而是使用了 Github 提供的 OAuth 认证， 原因是 OAuth认证允许使用一个包含认证信息的 URL， 只需设置 Hexo 插件要部署的 URL 即可，更方便一些。<br>首先在 <a href="https://github.com/settings/tokens" target="_blank" rel="external">Personal access tokens</a> 页面生成一个 Github Token， 设置这个 Token 有读写仓库的权限，使用 Token 时的 URL 格式为 https://<token>:x-oauth-basic@github.com//.git</token></p>
+<h4 id="加密-Github-Token"><a href="#加密-Github-Token" class="headerlink" title="加密 Github Token"></a>加密 Github Token</h4><p>到上一步为止其实已经能够完成自动化部署了，但是将 Github Token 明文上传到公开的仓库的话，任何看到这个 Token 的人都有权限来修改你的 Github 仓库。这里 Travis CI 提供一个加密机制， 原理是 我们使用加密过的 Token， Travis CI 在部署时会先解密再使用 Token。 这里需要使用 Travis CI 的命令行工具（Ruby gem）来进行加密：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ gem install travis</div><div class="line">$ travis login</div></pre></td></tr></table></figure></p>
+<p>在项目的根目录下运行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ travis encrypt &apos;GH_TOKEN=&lt;TOKEN&gt;&apos; --add</div></pre></td></tr></table></figure></p>
+<p>该命令会在 <code>.travis.yml</code> 中加入加密后的内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">env:</div><div class="line">  global:</div><div class="line">    secure: sRTHlTTZNVgj9bu1ANpz6lX//l//Q3R+eg/lzqEKthl4TYGHMIwukkn9gRG6BXFQveAU7duvmExb+54vvZxCl0z2+yLIxICn4xdsQSeBD96jCWHcf2Gdg6VgSerIGzCrqPHCRAeRJ2HwgiEjH5OifqewCqAgc6fDMGl5RGTjwevNLWhUA8q3PYoH5wH3u3mdGN/JeiWRmgxSobs/OmHNPBN08syCKbv3w10NQ5WL3Db486rY28oWL/wOUWQSXbT72RajM6l4PPrBmq1ObzLNoHGeFVTa9pE20kyCK5mFUGZNwQk5zpSoRTnVH+Uuqve77+x1dsjVNwxp/Wkm4kCTVSEQkeVsvCkB7hB5n44YlbkXEMfioxTZU2l5l3BURbD61KmV9ZecDgtbBWTcmcrM3GwWTPUquBZyUCNemrY9bIBA5O/dMVGzZXWL9qawdIqbxyvZyZo973EDyssnAST8AyYuKRRQkuP21eDWrLMe3qnykF/3gFoY2x/rZlRaIcoD42NCiU4T/Sn/SaMPZq/gpYUKepSnpwo0ilLNZxv9G15rUIPma9Urg1hGfFH01EDh2KK8KDfcoFlbHYkSEtE05npWoCH3tT1+3Scn1GA8SmMSBjgvVuvSutjUqyaojVPCCOSIP6oA9cTleSJQfbgv9TDWXhGUXHYy25DOV1EC9SM=</div></pre></td></tr></table></figure></p>
+<p>最后设置 git 提交的基本信息和 Hexo 部署使用的 URL：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">before_script:</div><div class="line">- git config --global user.name &apos;CtheSky&apos;</div><div class="line">- git config --global user.email &apos;cthesky@yeah.net&apos;</div><div class="line">- sed -i&apos;&apos; &quot;s~git@github.com:CtheSky/CtheSky.github.io.git~https://$&#123;GH_TOKEN&#125;:x-oauth-basic@github.com/CtheSky/CtheSky.github.io.git~&quot; _config.yml</div></pre></td></tr></table></figure></p>
+<p>至此所有配置就全部完成了，以下是我的配置文件，以供参考：<br><a href="https://github.com/CtheSky/CtheSky.github.io/blob/content/.travis.yml" target="_blank" rel="external">.travis.yml</a><br><a href="https://github.com/CtheSky/CtheSky.github.io/blob/content/_config.yml" target="_blank" rel="external">_config.yml</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Github/" rel="tag">#Github</a>
+          
+            <a href="/tags/Travis-CI/" rel="tag">#Travis CI</a>
+          
+            <a href="/tags/Hexo/" rel="tag">#Hexo</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/18/开始写博客/" rel="next" title="开始写博客">
+                <i class="fa fa-chevron-left"></i> 开始写博客
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/24/回顾Coursera上的Scala课程/" rel="prev" title="回顾Coursera上的Scala课程">
+                回顾Coursera上的Scala课程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/19/使用Travis-CI自动构建博客部署到Github/"
+           data-title="使用Travis CI自动构建博客部署到Github" data-url="http://yoursite.com/2016/08/19/使用Travis-CI自动构建博客部署到Github/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="CtheSky" />
+          <p class="site-author-name" itemprop="name">CtheSky</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Travis-CI-是什么？"><span class="nav-number">1.</span> <span class="nav-text">Travis CI 是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为你的项目启用-Travis-CI"><span class="nav-number">2.</span> <span class="nav-text">为你的项目启用 Travis CI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-travis-yml-文件"><span class="nav-number">3.</span> <span class="nav-text">配置 .travis.yml 文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构建项目"><span class="nav-number">3.0.1.</span> <span class="nav-text">构建项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#部署项目"><span class="nav-number">3.0.2.</span> <span class="nav-text">部署项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置-Github-Token-给予部署权限"><span class="nav-number">3.0.3.</span> <span class="nav-text">设置 Github Token 给予部署权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加密-Github-Token"><span class="nav-number">3.0.4.</span> <span class="nav-text">加密 Github Token</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">CtheSky</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"cthesky"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+
+  
+
+  
+
+</body>
+</html>
